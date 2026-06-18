@@ -1,20 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EmpireCAD - Login</title>
-<link rel="stylesheet" href="css/style.css">
+  <title>NYCRP911 Login</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0b1220;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #111a2e;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: #2563eb;
+      border: none;
+      color: white;
+    }
+  </style>
 </head>
-<body class="login">
-<div class="login-card">
-<h1>EmpireCAD</h1>
-<h2>New York State Communications Center</h2>
-<p class="subtitle">Powered by Summit Web Co.</p>
-<input type="email" placeholder="Dispatcher Email">
-<input type="password" placeholder="Password">
-<label><input type="checkbox"> Remember me</label>
-<button onclick="location.href='dashboard.html'">Login (Prototype)</button>
+
+<body>
+
+<div class="box">
+  <h2>NYCRP911 Login</h2>
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
 </div>
+
+<script>
+function login() {
+  const u = document.getElementById("user").value;
+  const p = document.getElementById("pass").value;
+
+  if(u && p) {
+    localStorage.setItem("loggedIn", "true");
+    window.location.href = "dashboard.html";
+  } else {
+    alert("Enter credentials");
+  }
+}
+</script>
+
 </body>
 </html>
