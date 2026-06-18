@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EmpireCAD | Units</title>
+
+    <link rel="icon" href="../assets/favicon.ico">
+
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<div class="sidebar">
+
+    <div class="logo">
+        Empire<span>CAD</span>
+    </div>
+
+    <a href="../dashboard.html">
+        🏠 Dashboard
+    </a>
+
+    <a href="calls.html">
+        🚨 Calls
+    </a>
+
+    <a class="active" href="units.html">
+        🚓 Units
+    </a>
+
+    <a href="map.html">
+        🗺️ Map
+    </a>
+
+    <a href="records.html">
+        📁 Records
+    </a>
+
+    <a href="admin.html">
+        ⚙️ Admin
+    </a>
+
+</div>
+
+<!-- ================= MAIN ================= -->
+
+<div class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+
+        <h2>Units Management</h2>
+
+        <div class="userBox">
+
+            <div>
+                <div id="userName">Loading...</div>
+                <small id="userRole" style="color:#9ca3af;">
+                    Dispatcher
+                </small>
+            </div>
+
+            <button id="logoutButton" class="secondaryButton">
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- ADD UNIT CARD -->
+        <div class="tableCard">
+
+            <h2>Add Unit</h2>
+
+            <label>Callsign</label>
+            <input id="callsign" placeholder="1Adam12">
+
+            <label>Department</label>
+            <select id="dept">
+
+                <option>Police</option>
+                <option>Fire</option>
+                <option>EMS</option>
+
+            </select>
+
+            <label>Status</label>
+            <select id="status">
+
+                <option value="available">10-8 Available</option>
+                <option value="busy">10-6 Busy</option>
+                <option value="scene">10-23 On Scene</option>
+                <option value="out">10-7 Out of Service</option>
+
+            </select>
+
+            <button id="addUnitBtn" class="primaryButton">
+                Add Unit
+            </button>
+
+        </div>
+
+        <!-- UNIT LIST -->
+        <div class="tableCard">
+
+            <h2>Active Units</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Callsign</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="unitTable">
+
+                    <tr>
+                        <td colspan="4">Loading units...</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module" src="../js/units.js"></script>
+
+</body>
+
+</html>
