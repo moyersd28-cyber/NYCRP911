@@ -183,9 +183,49 @@ window.assignUnit = async (callId) => {
 
     const ref = doc(db, "calls", callId);
 
-    await updateDoc(ref, {
+confirmAssign.onclick = async () => {
 
+    const unit = unitSelect.value;
+
+    if (!unit || !selectedCallId) return;
+
+    const callRef = doc(db, "calls", selectedCallId);
+
+    // 1. Add unit to call
+    await updateDoc(callRef, {
         assignedUnits: arrayUnion(unit)
+    });
+
+    // 2. Find unit document
+    const unitsSnapshot = await getDocs(collection(db, "units"));
+
+    let unitDocId = null;
+
+    unitsSnapshot.forEach((docSnap) => {
+
+        if (docSnap.data().callsign === unit) {
+            unitDocId = docSnap.id;
+        }
+
+    });
+
+    // 3. Update unit status
+    if (unitDocId) {
+
+        const unitRef = doc(db, "units", unitDocId);
+
+        await updateDoc(unitRef, {
+
+            status: "busy",
+            assignedCall: selectedCallId
+
+        });
+
+    }
+
+    modal.style.display = "none";
+
+};
 
     });
 
