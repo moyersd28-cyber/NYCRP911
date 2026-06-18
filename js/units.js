@@ -148,13 +148,18 @@ onSnapshot(unitsRef, (snapshot) => {
 
                 <td>${data.dept}</td>
 
-                <td>
-                    <span class="badge ${badgeClass}">
-                        ${data.status}
-                    </span>
-                </td>
+<td>
+    <span class="badge ${badgeClass}">
+        ${data.status}
+    </span>
 
-                <td>
+    ${data.assignedCall ? `
+        <br>
+        <small style="color:#9ca3af;">
+            Call: ${data.assignedCall}
+        </small>
+    ` : ""}
+</td>
                     <button class="dangerButton"
                         onclick="deleteUnit('${docSnap.id}')">
                         Delete
