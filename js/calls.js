@@ -7,6 +7,13 @@ Version: 0.2.0
 */
 
 import {
+    collection,
+    getDocs,
+    updateDoc,
+    doc
+} from "./firebase-config.js";
+
+import {
     auth,
     db,
     onAuthStateChanged,
