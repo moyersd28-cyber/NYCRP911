@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EmpireCAD Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="sidebar">
+<h2>EmpireCAD</h2>
+<nav>
+<button>Dashboard</button>
+<button>Calls</button>
+<button>Unit Board</button>
+<button>Activity</button>
+<button>Statistics</button>
+<button>Settings</button>
+</nav>
+</div>
+<div class="content">
+<header>
+<h1>New York State Communications Center</h1>
+<div class="topstats">
+<span>🚨 Active Calls: <b id="callCount">2</b></span>
+<span>🚔 Units: <b id="unitCount">2</b></span>
+</div>
+</header>
+<main class="grid">
+<section class="panel">
+<h3>Active Calls</h3>
+<div id="calls"></div>
+</section>
+<section class="panel">
+<h3>Unit Board</h3>
+<div id="units"></div>
+</section>
+<section class="panel full">
+<h3>Activity Log</h3>
+<div id="log"></div>
+</section>
+</main>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
