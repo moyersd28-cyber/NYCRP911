@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EmpireCAD | Calls</title>
+
+    <link rel="icon" href="../assets/favicon.ico">
+
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="logo">
+        Empire<span>CAD</span>
+    </div>
+
+    <a href="../dashboard.html">🏠 Dashboard</a>
+    <a class="active" href="calls.html">🚨 Calls</a>
+    <a href="units.html">🚓 Units</a>
+    <a href="map.html">🗺️ Map</a>
+    <a href="records.html">📁 Records</a>
+    <a href="admin.html">⚙️ Admin</a>
+
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- HEADER -->
+    <div class="header">
+
+        <h2>Active Calls</h2>
+
+        <div class="userBox">
+
+            <div>
+                <div id="userName">Loading...</div>
+                <small style="color:#9ca3af;">Dispatcher</small>
+            </div>
+
+            <button id="logoutButton" class="secondaryButton">
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- CREATE CALL -->
+        <div class="tableCard">
+
+            <h2>Create Call</h2>
+
+            <label>Call Type</label>
+            <select id="callType">
+
+                <option>Traffic Stop</option>
+                <option>10-50 Vehicle Accident</option>
+                <option>Structure Fire</option>
+                <option>Medical Emergency</option>
+                <option>Domestic Disturbance</option>
+                <option>Suspicious Activity</option>
+                <option>Robbery</option>
+                <option>Shots Fired</option>
+
+            </select>
+
+            <label>Priority</label>
+            <select id="priority">
+
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="emergency">Emergency</option>
+
+            </select>
+
+            <label>Location</label>
+            <input id="location" placeholder="123 Main St">
+
+            <label>Notes</label>
+            <textarea id="notes" placeholder="Additional details..."></textarea>
+
+            <button id="createCallBtn" class="primaryButton">
+                Create Call
+            </button>
+
+        </div>
+
+        <!-- CALL LIST -->
+        <div class="tableCard">
+
+            <h2>Active Calls</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Type</th>
+                        <th>Priority</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="callTable">
+
+                    <tr>
+                        <td colspan="5">Loading calls...</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module" src="../js/calls.js"></script>
+
+</body>
+
+</html>
