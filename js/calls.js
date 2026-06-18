@@ -1,7 +1,7 @@
 /*
 ====================================================
 EmpireCAD v2
-Calls Module
+Calls + Dispatch Module
 Version: 0.2.0
 ====================================================
 */
@@ -16,6 +16,9 @@ import {
     deleteDoc,
     doc,
     onSnapshot,
+    updateDoc,
+    arrayUnion,
+    arrayRemove,
     serverTimestamp
 } from "./firebase-config.js";
 
@@ -92,6 +95,7 @@ createBtn.onclick = async () => {
         location,
         notes,
         status: "active",
+        assignedUnits: [],   // 🚨 NEW
         createdAt: serverTimestamp()
 
     });
@@ -115,7 +119,7 @@ onSnapshot(callsRef, (snapshot) => {
 
         table.innerHTML = `
             <tr>
-                <td colspan="5">No active calls</td>
+                <td colspan="6">No active calls</td>
             </tr>
         `;
 
@@ -126,6 +130,8 @@ onSnapshot(callsRef, (snapshot) => {
 
         const data = docSnap.data();
 
+        const assigned = data.assignedUnits || [];
+
         table.innerHTML += `
             <tr>
 
@@ -135,13 +141,27 @@ onSnapshot(callsRef, (snapshot) => {
 
                 <td>${data.location}</td>
 
-                <td>${data.status}</td>
+                <td>
+                    ${data.status}<br>
+
+                    <small style="color:#9ca3af;">
+                        Units: ${assigned.length}
+                    </small>
+
+                </td>
 
                 <td>
+
+                    <button class="primaryButton"
+                        onclick="assignUnit('${docSnap.id}')">
+                        Assign Unit
+                    </button>
+
                     <button class="dangerButton"
                         onclick="deleteCall('${docSnap.id}')">
                         Clear
                     </button>
+
                 </td>
 
             </tr>
@@ -150,6 +170,27 @@ onSnapshot(callsRef, (snapshot) => {
     });
 
 });
+
+// ===============================
+// ASSIGN UNIT (simple prompt version)
+// ===============================
+
+window.assignUnit = async (callId) => {
+
+    const unit = prompt("Enter unit callsign (example: 1Adam12)");
+
+    if (!unit) return;
+
+    const ref = doc(db, "calls", callId);
+
+    await updateDoc(ref, {
+
+        assignedUnits: arrayUnion(unit)
+
+    });
+
+    alert(`Unit ${unit} assigned to call`);
+};
 
 // ===============================
 // DELETE CALL
