@@ -1,46 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EmpireCAD Dashboard</title>
-<link rel="stylesheet" href="css/style.css">
+  <title>NYCRP911 CAD</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0b1220;
+      color: white;
+    }
+
+    .nav {
+      background: #111a2e;
+      padding: 10px;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    input, select, button {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    td, th {
+      border: 1px solid #2b3a55;
+      padding: 8px;
+    }
+
+    button {
+      background: #2563eb;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
-<div class="sidebar">
-<h2>EmpireCAD</h2>
-<nav>
-<button>Dashboard</button>
-<button>Calls</button>
-<button>Unit Board</button>
-<button>Activity</button>
-<button>Statistics</button>
-<button>Settings</button>
-</nav>
+
+<div class="nav">
+  <h3>NYCRP911 Dispatch Console</h3>
 </div>
-<div class="content">
-<header>
-<h1>New York State Communications Center</h1>
-<div class="topstats">
-<span>🚨 Active Calls: <b id="callCount">2</b></span>
-<span>🚔 Units: <b id="unitCount">2</b></span>
+
+<div class="container">
+
+  <h2>Add Unit</h2>
+
+  <input id="callsign" placeholder="Callsign (1Adam10)">
+  <input id="officer" placeholder="Officer Name">
+
+  <select id="dept">
+    <option>Police</option>
+    <option>Fire</option>
+    <option>EMS</option>
+  </select>
+
+  <input id="vehicle" placeholder="Vehicle Type (Explorer, Ambulance...)">
+  <input id="location" placeholder="Current Location">
+
+  <button onclick="addUnit()">Add Unit</button>
+
+  <h2>Unit Roster</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Callsign</th>
+        <th>Officer</th>
+        <th>Dept</th>
+        <th>Status</th>
+        <th>Vehicle</th>
+        <th>Location</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="unitsTable"></tbody>
+  </table>
+
 </div>
-</header>
-<main class="grid">
-<section class="panel">
-<h3>Active Calls</h3>
-<div id="calls"></div>
-</section>
-<section class="panel">
-<h3>Unit Board</h3>
-<div id="units"></div>
-</section>
-<section class="panel full">
-<h3>Activity Log</h3>
-<div id="log"></div>
-</section>
-</main>
-</div>
-<script type="module" src="js/main.js"></script>
+
+<script type="module">
+import { db, collection, addDoc, getDocs, updateDoc, doc } from "./firebase-config.js";
+
+let units = [];
+
+async function loadUnits() {
+  const snap = await getDocs(collection(db, "units"));
+  units = [];
+
+  snap.forEach(d => {
+    units.push({ id: d.id, ...d.data() });
+  });
+
+  render();
+}
+
+window.addUnit = async function() {
+  const unit = {
+    callsign: document.getElementById("callsign").value,
+    officer: document.getElementById("officer").value,
+    dept: document.getElementById("dept").value,
+    vehicle: document.getElementById("vehicle").value,
+    location: document.getElementById("location").value,
+    status: "10-8"
+  };
+
+  await addDoc(collection(db, "units"), unit);
+
+  loadUnits();
+}
+
+window.toggleStatus = async function(id, current) {
+  const statuses = ["10-8", "10-7", "10-6"];
+  let next = statuses[(statuses.indexOf(current) + 1) % statuses.length];
+
+  await updateDoc(doc(db, "units", id), {
+    status: next
+  });
+
+  loadUnits();
+}
+
+function render() {
+  const table = document.getElementById("unitsTable");
+  table.innerHTML = "";
+
+  units.forEach(u => {
+    table.innerHTML += `
+      <tr>
+        <td>${u.callsign}</td>
+        <td>${u.officer}</td>
+        <td>${u.dept}</td>
+        <td>${u.status}</td>
+        <td>${u.vehicle}</td>
+        <td>${u.location}</td>
+        <td>
+          <button onclick="toggleStatus('${u.id}', '${u.status}')">
+            Change Status
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+loadUnits();
+</script>
+
 </body>
 </html>
