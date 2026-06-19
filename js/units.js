@@ -16,7 +16,9 @@ import {
     deleteDoc,
     doc,
     onSnapshot,
-    serverTimestamp
+    serverTimestamp,
+    updatedoc,
+    query
 } from "./firebase-config.js";
 
 // ===============================
