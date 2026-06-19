@@ -28,7 +28,9 @@ import {
     query,
     where,
     orderBy,
-    limit
+    limit,
+    arrayUnion,
+    arrayRemove
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
