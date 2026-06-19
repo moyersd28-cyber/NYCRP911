@@ -1,98 +1,90 @@
-/*
-====================================================
-EmpireCAD v2
-Calls + Dispatch Module
-Version: 0.2.0
-====================================================
-*/
-
-import {
-    collection,
-    getDocs,
-    updateDoc,
-    doc
-} from "./firebase-config.js";
-
 import {
     auth,
     db,
-    onAuthStateChanged,
-    signOut,
     collection,
     addDoc,
+    updateDoc,
     deleteDoc,
     doc,
     onSnapshot,
-    updateDoc,
+    getDocs,
+    query,
+    orderBy,
+    serverTimestamp,
     arrayUnion,
-    arrayRemove,
-    serverTimestamp
+    arrayRemove
 } from "./firebase-config.js";
 
-// ===============================
-// AUTH CHECK
-// ===============================
+let selectedCallId = null;
 
-onAuthStateChanged(auth, (user) => {
+// ======================================================
+// INIT
+// ======================================================
 
-    if (!user) {
-        window.location.href = "../index.html";
-        return;
-    }
+window.addEventListener("load", () => {
 
-    document.getElementById("userName").innerText =
-        user.email;
+    loadUser();
+    loadCalls();
+    loadUnits();
+
+    document.getElementById("createCallBtn")
+        .addEventListener("click", createCall);
+
+    document.getElementById("confirmAssign")
+        .addEventListener("click", assignUnit);
+
+    document.getElementById("closeModal")
+        .addEventListener("click", closeModal);
+
+    document.getElementById("closeDetails")
+        .addEventListener("click", closeDetailsModal);
 
 });
 
-// ===============================
-// LOGOUT
-// ===============================
+// ======================================================
+// USER DISPLAY
+// ======================================================
 
-document.getElementById("logoutButton").onclick = async () => {
+function loadUser() {
 
-    await signOut(auth);
+    const user = auth.currentUser;
 
-    window.location.href = "../index.html";
+    if (user) {
 
-};
+        document.getElementById("userName")
+            .innerText = user.email;
 
-// ===============================
-// ELEMENTS
-// ===============================
+    } else {
 
-const typeInput =
-    document.getElementById("callType");
+        setTimeout(loadUser, 500);
 
-const priorityInput =
-    document.getElementById("priority");
+    }
 
-const locationInput =
-    document.getElementById("location");
+}
 
-const notesInput =
-    document.getElementById("notes");
-
-const createBtn =
-    document.getElementById("createCallBtn");
-
-const table =
-    document.getElementById("callTable");
-
-// ===============================
+// ======================================================
 // CREATE CALL
-// ===============================
+// ======================================================
 
-createBtn.onclick = async () => {
+async function createCall() {
 
-    const type = typeInput.value;
-    const priority = priorityInput.value;
-    const location = locationInput.value.trim();
-    const notes = notesInput.value.trim();
+    const type =
+        document.getElementById("callType").value;
+
+    const priority =
+        document.getElementById("priority").value;
+
+    const location =
+        document.getElementById("location").value;
+
+    const notes =
+        document.getElementById("notes").value;
 
     if (!location) {
-        alert("Location is required");
+
+        alert("Location required");
         return;
+
     }
 
     await addDoc(collection(db, "calls"), {
@@ -101,152 +93,363 @@ createBtn.onclick = async () => {
         priority,
         location,
         notes,
+
         status: "active",
-        assignedUnits: [],   // 🚨 NEW
+
+        assignedUnits: [],
+
         createdAt: serverTimestamp()
 
     });
 
-    locationInput.value = "";
-    notesInput.value = "";
+    document.getElementById("location").value = "";
+    document.getElementById("notes").value = "";
+
+}
+
+// ======================================================
+// LOAD CALLS (REALTIME)
+// ======================================================
+
+function loadCalls() {
+
+    const q =
+        query(
+            collection(db, "calls"),
+            orderBy("createdAt", "desc")
+        );
+
+    onSnapshot(q, (snapshot) => {
+
+        const table =
+            document.getElementById("callTable");
+
+        table.innerHTML = "";
+
+        if (snapshot.empty) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="7">No active calls</td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        snapshot.forEach((docSnap) => {
+
+            const data = docSnap.data();
+
+            table.innerHTML += `
+                <tr>
+
+                    <td>${docSnap.id}</td>
+
+                    <td>${data.type}</td>
+
+                    <td>${data.priority}</td>
+
+                    <td>${data.location}</td>
+
+                    <td>${data.status}</td>
+
+                    <td>
+                        ${(data.assignedUnits || []).length}
+                    </td>
+
+                    <td>
+
+                        <button onclick="openDetails('${docSnap.id}')">
+                            View
+                        </button>
+
+                        <button onclick="openAssign('${docSnap.id}')">
+                            Dispatch
+                        </button>
+
+                        <button onclick="closeCall('${docSnap.id}')">
+                            Close
+                        </button>
+
+                    </td>
+
+                </tr>
+            `;
+
+        });
+
+    });
+
+}
+
+// ======================================================
+// LOAD UNITS (FOR DISPATCH)
+// ======================================================
+
+function loadUnits() {
+
+    const q =
+        query(collection(db, "units"));
+
+    onSnapshot(q, (snapshot) => {
+
+        const select =
+            document.getElementById("unitSelect");
+
+        select.innerHTML = "";
+
+        snapshot.forEach((docSnap) => {
+
+            const data = docSnap.data();
+
+            if (data.status === "available") {
+
+                const opt =
+                    document.createElement("option");
+
+                opt.value = docSnap.id;
+
+                opt.textContent =
+                    `${data.callsign} (${data.dept})`;
+
+                select.appendChild(opt);
+
+            }
+
+        });
+
+    });
+
+}
+
+// ======================================================
+// OPEN ASSIGN MODAL
+// ======================================================
+
+window.openAssign = function(callId) {
+
+    selectedCallId = callId;
+
+    document.getElementById("dispatchModal")
+        .style.display = "flex";
 
 };
 
-// ===============================
-// LIVE CALLS
-// ===============================
+// ======================================================
+// CLOSE MODAL
+// ======================================================
 
-const callsRef = collection(db, "calls");
+function closeModal() {
 
-onSnapshot(callsRef, (snapshot) => {
+    document.getElementById("dispatchModal")
+        .style.display = "none";
 
-    table.innerHTML = "";
+    selectedCallId = null;
 
-    if (snapshot.empty) {
+}
 
-        table.innerHTML = `
+// ======================================================
+// ASSIGN UNIT TO CALL
+// ======================================================
+
+async function assignUnit() {
+
+    const unitId =
+        document.getElementById("unitSelect").value;
+
+    if (!unitId || !selectedCallId) return;
+
+    const callRef =
+        doc(db, "calls", selectedCallId);
+
+    const unitRef =
+        doc(db, "units", unitId);
+
+    // Add unit to call
+    await updateDoc(callRef, {
+        assignedUnits: arrayUnion(unitId),
+        status: "dispatched"
+    });
+
+    // Mark unit as busy
+    await updateDoc(unitRef, {
+        status: "busy",
+        assignedCall: selectedCallId
+    });
+
+    closeModal();
+
+}
+
+// ======================================================
+// OPEN CALL DETAILS
+// ======================================================
+
+window.openDetails = async function(callId) {
+
+    const ref =
+        doc(db, "calls", callId);
+
+    const snap =
+        await getDoc(ref);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    document.getElementById("detailsModal")
+        .style.display = "flex";
+
+    document.getElementById("incidentDetails")
+        .innerHTML = `
+            <p><b>Type:</b> ${data.type}</p>
+            <p><b>Priority:</b> ${data.priority}</p>
+            <p><b>Location:</b> ${data.location}</p>
+            <p><b>Status:</b> ${data.status}</p>
+            <p><b>Notes:</b> ${data.notes || "None"}</p>
+        `;
+
+    loadRespondingUnits(data.assignedUnits || []);
+
+};
+
+// ======================================================
+// LOAD RESPONDING UNITS
+// ======================================================
+
+async function loadRespondingUnits(unitIds) {
+
+    const tbody =
+        document.getElementById("respondingUnits");
+
+    tbody.innerHTML = "";
+
+    if (unitIds.length === 0) {
+
+        tbody.innerHTML = `
             <tr>
-                <td colspan="6">No active calls</td>
+                <td colspan="4">No units assigned</td>
             </tr>
         `;
 
         return;
+
     }
 
-    snapshot.forEach((docSnap) => {
+    for (const id of unitIds) {
 
-        const data = docSnap.data();
+        const ref = doc(db, "units", id);
+        const snap = await getDoc(ref);
 
-        const assigned = data.assignedUnits || [];
+        if (!snap.exists()) continue;
 
-        table.innerHTML += `
+        const data = snap.data();
+
+        tbody.innerHTML += `
             <tr>
 
-                <td>${data.type}</td>
+                <td>${data.callsign}</td>
 
-                <td>${data.priority}</td>
+                <td>${data.dept}</td>
 
-                <td>${data.location}</td>
-
-                <td>
-                    ${data.status}<br>
-
-                    <small style="color:#9ca3af;">
-                        Units: ${assigned.length}
-                    </small>
-
-                </td>
+                <td>${data.status}</td>
 
                 <td>
-
-                    <button class="primaryButton"
-                        onclick="assignUnit('${docSnap.id}')">
-                        Assign Unit
+                    <button onclick="removeUnit('${id}')">
+                        Remove
                     </button>
-
-                    <button class="dangerButton"
-                        onclick="deleteCall('${docSnap.id}')">
-                        Clear
-                    </button>
-
                 </td>
 
             </tr>
         `;
 
-    });
+    }
 
-});
+}
 
-// ===============================
-// ASSIGN UNIT (simple prompt version)
-// ===============================
+// ======================================================
+// CLOSE CALL
+// ======================================================
 
-window.assignUnit = async (callId) => {
-
-    const unit = prompt("Enter unit callsign (example: 1Adam12)");
-
-    if (!unit) return;
+window.closeCall = async function(callId) {
 
     const ref = doc(db, "calls", callId);
 
-confirmAssign.onclick = async () => {
+    const snap = await getDoc(ref);
 
-    const unit = unitSelect.value;
+    if (!snap.exists()) return;
 
-    if (!unit || !selectedCallId) return;
+    const data = snap.data();
 
-    const callRef = doc(db, "calls", selectedCallId);
+    // Return all units to available
+    const units = data.assignedUnits || [];
 
-    // 1. Add unit to call
-    await updateDoc(callRef, {
-        assignedUnits: arrayUnion(unit)
-    });
+    for (const unitId of units) {
 
-    // 2. Find unit document
-    const unitsSnapshot = await getDocs(collection(db, "units"));
-
-    let unitDocId = null;
-
-    unitsSnapshot.forEach((docSnap) => {
-
-        if (docSnap.data().callsign === unit) {
-            unitDocId = docSnap.id;
-        }
-
-    });
-
-    // 3. Update unit status
-    if (unitDocId) {
-
-        const unitRef = doc(db, "units", unitDocId);
+        const unitRef = doc(db, "units", unitId);
 
         await updateDoc(unitRef, {
-
-            status: "busy",
-            assignedCall: selectedCallId
-
+            status: "available",
+            assignedCall: null
         });
 
     }
 
-    modal.style.display = "none";
-
-};
-
+    await updateDoc(ref, {
+        status: "closed",
+        assignedUnits: []
     });
 
-    alert(`Unit ${unit} assigned to call`);
 };
 
-// ===============================
-// DELETE CALL
-// ===============================
+// ======================================================
+// REMOVE UNIT FROM CALL
+// ======================================================
 
-window.deleteCall = async (id) => {
+window.removeUnit = async function(unitId) {
 
-    if (!confirm("Clear this call?")) return;
+    if (!selectedCallId) return;
 
-    await deleteDoc(doc(db, "calls", id));
+    const callRef = doc(db, "calls", selectedCallId);
+    const unitRef = doc(db, "units", unitId);
+
+    await updateDoc(callRef, {
+        assignedUnits: arrayRemove(unitId)
+    });
+
+    await updateDoc(unitRef, {
+        status: "available",
+        assignedCall: null
+    });
+
+    // refresh modal view
+    openDetails(selectedCallId);
 
 };
+
+// ======================================================
+// CLOSE DETAILS MODAL
+// ======================================================
+
+function closeDetailsModal() {
+
+    document.getElementById("detailsModal")
+        .style.display = "none";
+
+}
+
+// ======================================================
+// GLOBAL EXPORTS (SAFETY)
+// ======================================================
+
+window.closeModal = closeModal;
+window.assignUnit = assignUnit;
+window.closeDetailsModal = closeDetailsModal;
+
+// ======================================================
+// DONE
+// ======================================================
+
+console.log("EmpireCAD Calls System Loaded");
