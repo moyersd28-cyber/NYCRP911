@@ -1,0 +1,180 @@
+/* =====================================================
+   EmpireCAD v2
+   Dashboard Styles
+===================================================== */
+
+.main {
+    margin-left: 250px;
+    padding: 25px;
+    min-height: 100vh;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.tableCard {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+}
+
+.tableCard h2,
+.tableCard h3 {
+    margin: 0 0 20px 0;
+    color: #ffffff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #1a2436;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+}
+
+th {
+    color: #93c5fd;
+    font-weight: 600;
+}
+
+tr:hover {
+    background: rgba(255,255,255,.03);
+}
+
+label {
+    display: block;
+    margin: 15px 0 6px;
+    font-weight: 600;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: white;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 2px;
+    transition: 0.2s ease;
+}
+
+.primaryButton {
+    background: #2563eb;
+    color: white;
+}
+
+.primaryButton:hover {
+    background: #1d4ed8;
+}
+
+.secondaryButton {
+    background: #475569;
+    color: white;
+}
+
+.secondaryButton:hover {
+    background: #64748b;
+}
+
+.dangerButton {
+    background: #dc2626;
+    color: white;
+}
+
+.dangerButton:hover {
+    background: #b91c1c;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badge.available {
+    background: #16a34a;
+    color: white;
+}
+
+.badge.busy {
+    background: #f59e0b;
+    color: white;
+}
+
+.badge.scene {
+    background: #2563eb;
+    color: white;
+}
+
+.badge.out {
+    background: #dc2626;
+    color: white;
+}
+
+.userBox {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+@media (max-width: 900px) {
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+}
