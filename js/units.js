@@ -1,212 +1,371 @@
 /*
 ====================================================
-EmpireCAD v2
+EmpireCAD v2.2.1
 Units Module
-Version: 0.2.0
+Professional Dispatch Unit Management
+====================================================
+
+Features
+✔ Firebase Authentication
+✔ Live Firestore Sync
+✔ Add / Delete Units
+✔ Manual Status Updates
+✔ Department Ready
+✔ Future MDT Integration
 ====================================================
 */
 
 import {
     auth,
     db,
+
     onAuthStateChanged,
     signOut,
+
     collection,
     addDoc,
     deleteDoc,
     doc,
+    updateDoc,
+
     onSnapshot,
-    serverTimestamp,
-    updatedoc,
-    query
+
+    serverTimestamp
+
 } from "./firebase-config.js";
 
-// ===============================
-// AUTH CHECK + HEADER INFO
-// ===============================
+/*====================================================
+GLOBAL VARIABLES
+====================================================*/
+
+const unitsCollection = collection(db, "units");
+
+let currentUser = null;
+
+let units = [];
+
+/*====================================================
+AUTHENTICATION
+====================================================*/
 
 onAuthStateChanged(auth, (user) => {
 
     if (!user) {
+
         window.location.href = "../index.html";
+
         return;
+
     }
 
-    document.getElementById("userName").innerText =
+    currentUser = user;
+
+    document.getElementById("userName").textContent =
         user.email;
 
 });
 
-// ===============================
-// LOGOUT
-// ===============================
+/*====================================================
+LOGOUT
+====================================================*/
 
-document.getElementById("logoutButton").onclick = async () => {
+document
+    .getElementById("logoutButton")
+    .addEventListener("click", async () => {
 
-    await signOut(auth);
+        await signOut(auth);
 
-    window.location.href = "../index.html";
+        window.location.href = "../index.html";
 
-};
+});
 
-// ===============================
-// ELEMENTS
-// ===============================
+/*====================================================
+ELEMENT REFERENCES
+====================================================*/
 
 const callsignInput =
     document.getElementById("callsign");
 
-const deptInput =
+const departmentInput =
     document.getElementById("dept");
 
 const statusInput =
     document.getElementById("status");
 
-const addBtn =
+const addButton =
     document.getElementById("addUnitBtn");
 
-const table =
+const tableBody =
     document.getElementById("unitTable");
 
-// ===============================
-// ADD UNIT
-// ===============================
+/*====================================================
+ADD UNIT
+====================================================*/
 
-addBtn.onclick = async () => {
+addButton.addEventListener("click", addUnit);
 
-    const callsign = callsignInput.value.trim();
-    const dept = deptInput.value;
-    const status = statusInput.value;
+async function addUnit() {
+
+    const callsign =
+        callsignInput.value.trim();
 
     if (!callsign) {
-        alert("Callsign is required");
-        return;
-    }
 
-    await addDoc(collection(db, "units"), {
-
-        callsign,
-        dept,
-        status,
-        createdAt: serverTimestamp()
-
-    });
-
-    callsignInput.value = "";
-
-};
-
-// ===============================
-// LIVE UNIT LISTENER
-// ===============================
-
-const unitsRef = collection(db, "units");
-
-onSnapshot(unitsRef, (snapshot) => {
-
-    table.innerHTML = "";
-
-    if (snapshot.empty) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="4">No units available</td>
-            </tr>
-        `;
+        alert("Please enter a callsign.");
 
         return;
+
     }
-
-    snapshot.forEach((docSnap) => {
-
-        const data = docSnap.data();
-
-        let badgeClass = "";
-
-        switch (data.status) {
-
-            case "available":
-                badgeClass = "available";
-                break;
-
-            case "busy":
-                badgeClass = "busy";
-                break;
-
-            case "scene":
-                badgeClass = "scene";
-                break;
-
-            case "out":
-                badgeClass = "out";
-                break;
-
-        }
-
-        table.innerHTML += `
-            <tr>
-
-                <td>${data.callsign}</td>
-
-                <td>${data.dept}</td>
-
-<td>
-    <span class="badge ${badgeClass}">
-        ${data.status}
-    </span>
-
-    ${data.assignedCall ? `
-        <br>
-        <small style="color:#9ca3af;">
-            Call: ${data.assignedCall}
-        </small>
-    ` : ""}
-</td>
-                    <button class="dangerButton"
-                        onclick="deleteUnit('${docSnap.id}')">
-                        Delete
-                    </button>
-                </td>
-
-            </tr>
-        `;
-
-    });
-
-});
-
-// ===============================
-// DELETE UNIT
-// ===============================
-
-window.deleteUnit = async (id) => {
-
-    if (!confirm("Delete this unit?")) return;
-
-    await deleteDoc(doc(db, "units", id));
-
-};
-
-// =====================================================
-// UPDATE UNIT STATUS
-// =====================================================
-
-window.setUnitStatus = async function(unitId, status) {
 
     try {
 
-        await updateDoc(
-            doc(db, "units", unitId),
-            {
-                status: status
-            }
-        );
+        await addDoc(unitsCollection, {
 
-    } catch(error) {
+            callsign,
+
+            department:
+                departmentInput.value,
+
+            status:
+                statusInput.value,
+
+            assignedCall: null,
+
+            officer: "",
+
+            radioChannel: "Dispatch",
+
+            createdAt:
+                serverTimestamp(),
+
+            lastStatusChange:
+                serverTimestamp()
+
+        });
+
+        callsignInput.value = "";
+
+    }
+
+    catch (error) {
 
         console.error(error);
 
-        alert("Unable to update unit status.");
+        alert("Unable to add unit.");
+
+    }
+
+}
+
+/*====================================================
+LIVE FIRESTORE LISTENER
+====================================================*/
+
+onSnapshot(unitsCollection, (snapshot) => {
+
+    units = [];
+
+    snapshot.forEach((docSnap) => {
+
+        units.push({
+
+            id: docSnap.id,
+
+            ...docSnap.data()
+
+        });
+
+    });
+
+    renderUnits();
+
+});
+/*====================================================
+RENDER UNIT TABLE
+====================================================*/
+
+function renderUnits() {
+
+    tableBody.innerHTML = "";
+
+    if (units.length === 0) {
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;color:#9ca3af;">
+                    No units available.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+    units.forEach(unit => {
+
+        tableBody.innerHTML += createUnitRow(unit);
+
+    });
+
+}
+
+/*====================================================
+CREATE UNIT ROW
+====================================================*/
+
+function createUnitRow(unit) {
+
+    return `
+
+<tr>
+
+    <td>
+
+        <strong>${unit.callsign}</strong>
+
+    </td>
+
+    <td>
+
+        ${unit.department}
+
+    </td>
+
+    <td>
+
+        ${createStatusBadge(unit.status)}
+
+        ${
+            unit.assignedCall
+            ?
+
+            `<br>
+            <small style="color:#9ca3af;">
+                🚨 ${unit.assignedCall}
+            </small>`
+
+            :
+
+            `<br>
+            <small style="color:#64748b;">
+                No Active Call
+            </small>`
+        }
+
+    </td>
+
+    <td>
+
+        <div class="unitButtons">
+
+            <button
+                class="statusGreen"
+                onclick="setUnitStatus('${unit.id}','available')">
+
+                🟢
+
+            </button>
+
+            <button
+                class="statusBlue"
+                onclick="setUnitStatus('${unit.id}','enroute')">
+
+                🚓
+
+            </button>
+
+            <button
+                class="statusPurple"
+                onclick="setUnitStatus('${unit.id}','onscene')">
+
+                📍
+
+            </button>
+
+            <button
+                class="statusOrange"
+                onclick="setUnitStatus('${unit.id}','busy')">
+
+                🔶
+
+            </button>
+
+            <button
+                class="statusRed"
+                onclick="setUnitStatus('${unit.id}','outofservice')">
+
+                ⛔
+
+            </button>
+
+        </div>
+
+    </td>
+
+    <td>
+
+        <button
+
+            class="dangerButton"
+
+            onclick="deleteUnit('${unit.id}')">
+
+            Delete
+
+        </button>
+
+    </td>
+
+</tr>
+
+`;
+
+}
+
+/*====================================================
+STATUS BADGES
+====================================================*/
+
+function createStatusBadge(status) {
+
+    switch(status){
+
+        case "available":
+
+            return `<span class="badge available">
+                        🟢 Available
+                    </span>`;
+
+        case "enroute":
+
+            return `<span class="badge enroute">
+                        🚓 En Route
+                    </span>`;
+
+        case "onscene":
+
+            return `<span class="badge onscene">
+                        📍 On Scene
+                    </span>`;
+
+        case "busy":
+
+            return `<span class="badge busy">
+                        🔶 Busy
+                    </span>`;
+
+        case "outofservice":
+
+            return `<span class="badge outofservice">
+                        ⛔ Out of Service
+                    </span>`;
+
+        default:
+
+            return `<span class="badge">
+                        Unknown
+                    </span>`;
 
     }
 
