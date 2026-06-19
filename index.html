@@ -135,6 +135,8 @@ button.onclick = async () => {
 
     status.innerHTML = "Signing in...";
 
+    console.log("Email:", `"${email.value.trim()}"`);
+    
     const user =
         await login(
             email.value.trim(),
