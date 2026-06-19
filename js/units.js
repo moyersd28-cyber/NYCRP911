@@ -186,3 +186,28 @@ window.deleteUnit = async (id) => {
     await deleteDoc(doc(db, "units", id));
 
 };
+
+// =====================================================
+// UPDATE UNIT STATUS
+// =====================================================
+
+window.setUnitStatus = async function(unitId, status) {
+
+    try {
+
+        await updateDoc(
+            doc(db, "units", unitId),
+            {
+                status: status
+            }
+        );
+
+    } catch(error) {
+
+        console.error(error);
+
+        alert("Unable to update unit status.");
+
+    }
+
+}
