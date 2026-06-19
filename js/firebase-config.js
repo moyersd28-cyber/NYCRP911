@@ -1,5 +1,5 @@
 // =====================================================
-// EmpireCAD v2
+// EmpireCAD v2.2
 // Firebase Configuration
 // =====================================================
 
@@ -24,11 +24,14 @@ import {
     deleteDoc,
     doc,
     serverTimestamp,
+    Timestamp,
     onSnapshot,
     query,
     where,
     orderBy,
     limit,
+    writeBatch,
+    increment,
     arrayUnion,
     arrayRemove
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
@@ -45,7 +48,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-
 export const db = getFirestore(app);
 
 export {
@@ -58,15 +60,18 @@ export {
     deleteDoc,
     doc,
     serverTimestamp,
+    Timestamp,
     onSnapshot,
     query,
     where,
     orderBy,
     limit,
+    writeBatch,
+    increment,
+    arrayUnion,
+    arrayRemove,
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut,
-    createUserWithEmailAndPassword,
-    arrayUnion,
-    arrayRemove
+    createUserWithEmailAndPassword
 };
