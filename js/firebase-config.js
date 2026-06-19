@@ -66,5 +66,7 @@ export {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    arrayUnion,
+    arrayRemove
 };
