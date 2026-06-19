@@ -120,28 +120,28 @@ async function addUnit() {
     try {
 
         await addDoc(unitsCollection, {
+    callsign,
 
-            callsign,
+    department: departmentInput.value,
 
-            department:
-                departmentInput.value,
+    status: statusInput.value,
 
-            status:
-                statusInput.value,
+    officer: "",
 
-            assignedCall: null,
+    division: "Patrol",
 
-            officer: "",
+    assignedCall: null,
 
-            radioChannel: "Dispatch",
+    radioChannel: "Dispatch",
 
-            createdAt:
-                serverTimestamp(),
+    vehicle: "",
 
-            lastStatusChange:
-                serverTimestamp()
+    notes: "",
 
-        });
+    createdAt: serverTimestamp(),
+
+    lastStatusChange: serverTimestamp()
+});
 
         callsignInput.value = "";
 
@@ -368,5 +368,155 @@ function createStatusBadge(status) {
                     </span>`;
 
     }
+
+}
+
+/*====================================================
+UPDATE UNIT STATUS
+====================================================*/
+
+window.setUnitStatus = async function(unitId, status){
+
+    try{
+
+        await updateDoc(
+            doc(db,"units",unitId),
+            {
+
+                status,
+
+                lastStatusChange:
+                    serverTimestamp()
+
+            }
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert("Unable to update unit status.");
+
+    }
+
+}
+
+/*====================================================
+DELETE UNIT
+====================================================*/
+
+window.deleteUnit = async function(unitId){
+
+    const confirmed =
+        confirm(
+            "Delete this unit?\n\nThis action cannot be undone."
+        );
+
+    if(!confirmed) return;
+
+    try{
+
+        await deleteDoc(
+            doc(db,"units",unitId)
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert("Unable to delete unit.");
+
+    }
+
+}
+
+/*====================================================
+UPDATE UNIT DETAILS
+====================================================*/
+
+async function updateUnit(unitId,data){
+
+    try{
+
+        await updateDoc(
+
+            doc(db,"units",unitId),
+
+            data
+
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert("Unable to update unit.");
+
+    }
+
+}
+
+/*====================================================
+FIND UNIT
+====================================================*/
+
+function getUnit(id){
+
+    return units.find(
+        unit => unit.id === id
+    );
+
+}
+
+/*====================================================
+STATUS COLORS
+====================================================*/
+
+function getStatusColor(status){
+
+    switch(status){
+
+        case "available":
+            return "#22c55e";
+
+        case "enroute":
+            return "#2563eb";
+
+        case "onscene":
+            return "#7c3aed";
+
+        case "busy":
+            return "#f59e0b";
+
+        case "outofservice":
+            return "#dc2626";
+
+        default:
+            return "#64748b";
+
+    }
+
+}
+
+/*====================================================
+FORMAT DATE
+====================================================*/
+
+function formatDate(timestamp){
+
+    if(!timestamp) return "-";
+
+    if(timestamp.toDate){
+
+        return timestamp
+            .toDate()
+            .toLocaleString();
+
+    }
+
+    return "-";
 
 }
