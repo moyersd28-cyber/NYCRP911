@@ -4,9 +4,11 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EmpireCAD | Calls</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EmpireCAD | Dispatch Center</title>
 
     <link rel="icon" href="../assets/favicon.ico">
 
@@ -17,112 +19,393 @@
 
 <body>
 
-<!-- SIDEBAR -->
+<!-- ===========================
+     SIDEBAR
+============================ -->
+
 <div class="sidebar">
 
     <div class="logo">
         Empire<span>CAD</span>
     </div>
 
-    <a href="../dashboard.html">🏠 Dashboard</a>
-    <a class="active" href="calls.html">🚨 Calls</a>
-    <a href="units.html">🚓 Units</a>
-    <a href="map.html">🗺️ Map</a>
-    <a href="records.html">📁 Records</a>
-    <a href="admin.html">⚙️ Admin</a>
+    <a href="../dashboard.html">
+        🏠 Dashboard
+    </a>
+
+    <a class="active" href="calls.html">
+        🚨 Calls
+    </a>
+
+    <a href="units.html">
+        🚓 Units
+    </a>
+
+    <a href="records.html">
+        📁 Records
+    </a>
+
+    <a href="map.html">
+        🗺️ Map
+    </a>
+
+    <a href="admin.html">
+        ⚙️ Admin
+    </a>
 
 </div>
 
-<!-- MAIN -->
+<!-- ===========================
+     MAIN CONTENT
+============================ -->
+
 <div class="main">
 
     <!-- HEADER -->
+
     <div class="header">
 
-        <h2>Active Calls</h2>
+        <div>
+
+            <h2>
+                Dispatch Center
+            </h2>
+
+            <small style="color:#9ca3af;">
+                Live Fire / EMS / Law Enforcement Dispatch
+            </small>
+
+        </div>
 
         <div class="userBox">
 
             <div>
-                <div id="userName">Loading...</div>
-                <small style="color:#9ca3af;">Dispatcher</small>
+
+                <div id="userName">
+                    Loading...
+                </div>
+
+                <small style="color:#9ca3af;">
+                    Dispatcher
+                </small>
+
             </div>
 
-            <button id="logoutButton" class="secondaryButton">
+            <button
+                id="logoutButton"
+                class="secondaryButton">
+
                 Logout
+
             </button>
 
         </div>
 
     </div>
 
-    <!-- CONTENT -->
-    <div class="content">
+    <!-- ===========================
+         CREATE CALL
+    ============================ -->
 
-        <!-- CREATE CALL -->
-        <div class="tableCard">
+    <div class="tableCard">
 
-            <h2>Create Call</h2>
+        <h2>Create 911 Call</h2>
 
-            <label>Call Type</label>
-            <select id="callType">
+        <label>Incident Type</label>
 
-                <option>Traffic Stop</option>
-                <option>10-50 Vehicle Accident</option>
-                <option>Structure Fire</option>
-                <option>Medical Emergency</option>
-                <option>Domestic Disturbance</option>
-                <option>Suspicious Activity</option>
-                <option>Robbery</option>
-                <option>Shots Fired</option>
+        <select id="callType">
 
-            </select>
+            <option>Traffic Stop</option>
+            <option>Motor Vehicle Accident</option>
+            <option>Medical Emergency</option>
+            <option>Structure Fire</option>
+            <option>Commercial Fire Alarm</option>
+            <option>Domestic Disturbance</option>
+            <option>Suspicious Person</option>
+            <option>Robbery</option>
+            <option>Burglary</option>
+            <option>Shots Fired</option>
+            <option>Officer Needs Assistance</option>
+            <option>Fire Investigation</option>
 
-            <label>Priority</label>
-            <select id="priority">
+        </select>
 
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="emergency">Emergency</option>
+        <label>Priority</label>
 
-            </select>
+        <select id="priority">
 
-            <label>Location</label>
-            <input id="location" placeholder="123 Main St">
+            <option value="low">
+                Low
+            </option>
 
-            <label>Notes</label>
-            <textarea id="notes" placeholder="Additional details..."></textarea>
+            <option value="medium">
+                Medium
+            </option>
 
-            <button id="createCallBtn" class="primaryButton">
-                Create Call
-            </button>
+            <option value="high">
+                High
+            </option>
+
+            <option value="emergency">
+                Emergency
+            </option>
+
+        </select>
+
+        <label>Location</label>
+
+        <input
+            id="location"
+            placeholder="123 Main Street">
+
+        <label>Caller Information</label>
+
+        <input
+            id="caller"
+            placeholder="Caller name or phone (optional)">
+
+        <label>Notes</label>
+
+        <textarea
+            id="notes"
+            rows="5"
+            placeholder="Describe the incident..."></textarea>
+
+        <button
+            id="createCallBtn"
+            class="primaryButton">
+
+            Create Incident
+
+        </button>
+
+    </div>
+
+    <!-- ===========================
+         ACTIVE INCIDENTS
+    ============================ -->
+
+    <div class="tableCard">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+        ">
+
+            <h2>
+                Active Incidents
+            </h2>
+
+            <span id="activeCallCount"
+                  class="badge available">
+
+                0 Active
+
+            </span>
 
         </div>
 
-        <!-- CALL LIST -->
-        <div class="tableCard">
+        <table>
 
-            <h2>Active Calls</h2>
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Incident</th>
+
+                    <th>Priority</th>
+
+                    <th>Location</th>
+
+                    <th>Status</th>
+
+                    <th>Responding Units</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="callTable">
+
+                <tr>
+
+                    <td colspan="7">
+
+                        Loading Dispatch Board...
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+        <!-- ==========================================
+         ASSIGN UNIT MODAL
+    =========================================== -->
+
+    <div id="dispatchModal"
+         style="
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.65);
+            justify-content:center;
+            align-items:center;
+            z-index:999;
+         ">
+
+        <div class="tableCard"
+             style="
+                width:500px;
+                max-width:95%;
+             ">
+
+            <h2>Dispatch Unit</h2>
+
+            <p style="color:#9ca3af;">
+                Select an available unit to assign to this incident.
+            </p>
+
+            <label>Available Units</label>
+
+            <select id="unitSelect">
+
+                <option>
+                    Loading units...
+                </option>
+
+            </select>
+
+            <div style="
+                display:flex;
+                gap:12px;
+                margin-top:25px;
+            ">
+
+                <button
+                    id="confirmAssign"
+                    class="primaryButton"
+                    style="flex:1;">
+
+                    Assign Unit
+
+                </button>
+
+                <button
+                    id="closeModal"
+                    class="secondaryButton"
+                    style="flex:1;">
+
+                    Cancel
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         INCIDENT DETAILS MODAL
+    =========================================== -->
+
+    <div id="detailsModal"
+         style="
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.65);
+            justify-content:center;
+            align-items:center;
+            z-index:998;
+         ">
+
+        <div class="tableCard"
+             style="
+                width:700px;
+                max-width:95%;
+                max-height:85vh;
+                overflow:auto;
+             ">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+            ">
+
+                <h2>
+                    Incident Details
+                </h2>
+
+                <button
+                    id="closeDetails"
+                    class="secondaryButton">
+
+                    Close
+
+                </button>
+
+            </div>
+
+            <hr>
+
+            <div id="incidentDetails">
+
+                Loading...
+
+            </div>
+
+            <hr style="margin-top:30px;">
+
+            <h3>
+                Responding Units
+            </h3>
 
             <table>
 
                 <thead>
 
                     <tr>
-                        <th>Type</th>
-                        <th>Priority</th>
-                        <th>Location</th>
+
+                        <th>Callsign</th>
+
+                        <th>Department</th>
+
                         <th>Status</th>
+
                         <th>Action</th>
+
                     </tr>
 
                 </thead>
 
-                <tbody id="callTable">
+                <tbody id="respondingUnits">
 
                     <tr>
-                        <td colspan="5">Loading calls...</td>
+
+                        <td colspan="4">
+
+                            No units assigned.
+
+                        </td>
+
                     </tr>
 
                 </tbody>
@@ -132,57 +415,12 @@
         </div>
 
     </div>
+        <!-- ==========================================
+         PAGE SCRIPTS
+    =========================================== -->
 
 </div>
 
-<!-- ================= DISPATCH MODAL ================= -->
-
-<div id="dispatchModal"
-     style="
-        display:none;
-        position:fixed;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        background:rgba(0,0,0,0.6);
-        justify-content:center;
-        align-items:center;
-        z-index:999;
-     ">
-
-    <div style="
-        background:#1d2940;
-        padding:20px;
-        border-radius:12px;
-        width:350px;
-    ">
-
-        <h2>Assign Unit</h2>
-
-        <select id="unitSelect"
-                style="width:100%;padding:10px;margin-top:10px;">
-        </select>
-
-        <div style="margin-top:15px;display:flex;gap:10px;">
-
-            <button id="confirmAssign"
-                    class="primaryButton"
-                    style="flex:1;">
-                Assign
-            </button>
-
-            <button id="closeModal"
-                    class="secondaryButton"
-                    style="flex:1;">
-                Cancel
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
 <script type="module" src="../js/calls.js"></script>
 
 </body>
