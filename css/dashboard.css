@@ -178,3 +178,62 @@ textarea {
     }
 
 }
+.unitButtons{
+
+    display:flex;
+
+    gap:6px;
+
+    flex-wrap:wrap;
+
+}
+
+.unitButtons button{
+
+    cursor:pointer;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:6px 10px;
+
+    transition:.2s;
+
+}
+
+.unitButtons button:hover{
+
+    transform:scale(1.08);
+
+}
+
+.statusGreen{
+
+    background:#22c55e;
+
+}
+
+.statusBlue{
+
+    background:#2563eb;
+
+}
+
+.statusPurple{
+
+    background:#7c3aed;
+
+}
+
+.statusOrange{
+
+    background:#f59e0b;
+
+}
+
+.statusRed{
+
+    background:#dc2626;
+
+}
