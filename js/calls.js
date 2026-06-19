@@ -114,11 +114,12 @@ async function createCall() {
 
 function loadCalls() {
 
-    const q =
-        query(
-            collection(db, "calls"),
-            orderBy("createdAt", "desc")
-        );
+const q = query(
+    collection(db, "calls"),
+    where("status", "!=", "closed"),
+    orderBy("status"),
+    orderBy("createdAt", "desc")
+);
 
     onSnapshot(q, (snapshot) => {
 
