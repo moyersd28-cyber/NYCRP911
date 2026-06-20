@@ -272,7 +272,15 @@ function createUnitRow(unit) {
 
     <td>
 
-        ${unit.department}
+       ${unit.department}
+
+<br>
+
+<small>
+
+${unit.officer || "No Officer Assigned"}
+
+</small>
 
     </td>
 
