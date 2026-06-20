@@ -248,76 +248,49 @@
         </table>
 
     </div>
-        <!-- ==========================================
-         ASSIGN UNIT MODAL
-    =========================================== -->
+    
+   <!-- ==========================================
+DISPATCH UNITS MODAL
+========================================== -->
 
-    <div id="dispatchModal"
-         style="
-            display:none;
-            position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
-            background:rgba(0,0,0,.65);
-            justify-content:center;
-            align-items:center;
-            z-index:999;
-         ">
+<div id="dispatchModal" class="modal">
 
-        <div class="tableCard"
-             style="
-                width:500px;
-                max-width:95%;
-             ">
+    <div class="modalCard">
 
-            <h2>Dispatch Unit</h2>
+        <h2>Dispatch Units</h2>
 
-            <p style="color:#9ca3af;">
-                Select an available unit to assign to this incident.
-            </p>
+        <p>Select one or more available units.</p>
 
-            <label>Available Units</label>
+        <div id="dispatchUnitList" class="unitSelection">
 
-            <select id="unitSelect">
+            Loading...
 
-                <option>
-                    Loading units...
-                </option>
+        </div>
 
-            </select>
+        <div class="modalButtons">
 
-            <div style="
-                display:flex;
-                gap:12px;
-                margin-top:25px;
-            ">
+            <button
+                id="assignUnitsBtn"
+                class="primaryButton">
 
-                <button
-                    id="confirmAssign"
-                    class="primaryButton"
-                    style="flex:1;">
+                Assign Selected Units
 
-                    Assign Unit
+            </button>
 
-                </button>
+            <button
+                id="cancelDispatchBtn"
+                class="secondaryButton">
 
-                <button
-                    id="closeModal"
-                    class="secondaryButton"
-                    style="flex:1;">
+                Cancel
 
-                    Cancel
-
-                </button>
-
-            </div>
+            </button>
 
         </div>
 
     </div>
 
+</div>
+    
     <!-- ==========================================
          INCIDENT DETAILS MODAL
     =========================================== -->
