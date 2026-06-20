@@ -237,3 +237,31 @@ textarea {
     background:#dc2626;
 
 }
+
+/*==================================
+UNITS TOOLBAR
+==================================*/
+
+.toolbar{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-bottom:20px;
+
+    flex-wrap:wrap;
+
+}
+
+.toolbar input{
+
+    flex:1;
+
+}
+
+.toolbar select{
+
+    width:220px;
+
+}
