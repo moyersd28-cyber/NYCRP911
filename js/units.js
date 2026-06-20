@@ -190,32 +190,70 @@ onSnapshot(unitsCollection, (snapshot) => {
 RENDER UNIT TABLE
 ====================================================*/
 
-function renderUnits() {
+function renderUnits(){
 
     tableBody.innerHTML = "";
 
-    if (units.length === 0) {
+    const search =
+        searchInput.value.toLowerCase();
 
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align:center;color:#9ca3af;">
-                    No units available.
-                </td>
-            </tr>
+    const department =
+        departmentFilter.value;
+
+    const filteredUnits = units.filter(unit=>{
+
+        const matchesSearch =
+
+            unit.callsign
+                .toLowerCase()
+                .includes(search)
+
+            ||
+
+            (unit.officer || "")
+                .toLowerCase()
+                .includes(search);
+
+        const matchesDepartment =
+
+            department==="all"
+
+            ||
+
+            unit.department===department;
+
+        return matchesSearch && matchesDepartment;
+
+    });
+
+    if(filteredUnits.length===0){
+
+        tableBody.innerHTML=`
+
+        <tr>
+
+            <td colspan="6">
+
+                No matching units found.
+
+            </td>
+
+        </tr>
+
         `;
 
         return;
 
     }
 
-    units.forEach(unit => {
+    filteredUnits.forEach(unit=>{
 
-        tableBody.innerHTML += createUnitRow(unit);
+        tableBody.innerHTML+=
+            createUnitRow(unit);
 
     });
 
 }
-
 /*====================================================
 CREATE UNIT ROW
 ====================================================*/
