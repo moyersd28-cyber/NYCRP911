@@ -33,7 +33,8 @@ import {
     writeBatch,
     increment,
     arrayUnion,
-    arrayRemove
+    arrayRemove,
+    runTransaction
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -73,5 +74,6 @@ export {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    runTransaction
 };
