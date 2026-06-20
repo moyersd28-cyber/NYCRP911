@@ -44,9 +44,31 @@ const callsCollection =
 
 let currentUser = null;
 
-let calls = [];
+/*====================================================
+GLOBAL STATE
+====================================================*/
 
-let selectedCall = null;
+const state = {
+
+    currentUser: null,
+
+    calls: [],
+
+    selectedCall: null,
+
+    selectedUnit: null,
+
+    filters: {
+
+        priority: "all",
+
+        status: "active",
+
+        search: ""
+
+    }
+
+};
 
 /*====================================================
 AUTHENTICATION
@@ -111,11 +133,11 @@ LIVE CALL LISTENER
 
 onSnapshot(callsCollection,(snapshot)=>{
 
-    calls=[];
+    state.calls = [];
 
     snapshot.forEach((docSnap)=>{
 
-        calls.push({
+        state.calls.push({
 
             id:docSnap.id,
 
