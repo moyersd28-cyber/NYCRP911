@@ -324,6 +324,49 @@ function statusBadge(status){
 }
 
 /*====================================================
+GENERATE INCIDENT NUMBER
+====================================================*/
+
+async function generateIncidentNumber() {
+
+    const year = new Date().getFullYear();
+
+    const counterRef = doc(db, "system", "incidentCounter");
+
+    try {
+
+        const incidentNumber = await runTransaction(db, async (transaction) => {
+
+            const counterDoc = await transaction.get(counterRef);
+
+            let nextNumber = 1;
+
+            if (counterDoc.exists()) {
+                nextNumber = (counterDoc.data().lastNumber || 0) + 1;
+            }
+
+            transaction.set(counterRef, {
+                lastNumber: nextNumber,
+                year: year
+            });
+
+            return `NY-${year}-${String(nextNumber).padStart(6, "0")}`;
+
+        });
+
+        return incidentNumber;
+
+    } catch (error) {
+
+        console.error("Incident Number Error:", error);
+
+        throw error;
+
+    }
+
+}
+
+/*====================================================
 CREATE CALL
 ====================================================*/
 
@@ -331,11 +374,28 @@ createButton.addEventListener("click", createCall);
 
 async function createCall(){
 
+if (!typeInput.value) {
+    alert("Please select a call type.");
+    return;
+}
+
+if (!priorityInput.value) {
+    alert("Please select a priority.");
+    return;
+}
+
+if (!locationInput.value.trim()) {
+    alert("Please enter a location.");
+    return;
+}
+    
     try{
 
+        const incidentNumber = await generateIncidentNumber();
+        
         await addDoc(callsCollection,{
 
-            incidentNumber: null,
+            incidentNumber,
 
             type: typeInput.value,
 
