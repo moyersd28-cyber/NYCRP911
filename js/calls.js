@@ -84,7 +84,7 @@ onAuthStateChanged(auth, (user)=>{
 
     }
 
-    currentUser=user;
+    state.currentUser=user;
 
     document.getElementById("userName").textContent=
         user.email;
@@ -150,4 +150,228 @@ onSnapshot(callsCollection,(snapshot)=>{
     renderCalls();
 
 });
+
+/*====================================================
+RENDER CALLS
+====================================================*/
+
+function renderCalls() {
+
+    tableBody.innerHTML = "";
+
+    if (state.calls.length === 0) {
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="emptyTable">
+                    No Active Calls
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+    state.calls.forEach(call => {
+
+        tableBody.innerHTML += createCallRow(call);
+
+    });
+
+}
+
+/*====================================================
+CREATE CALL ROW
+====================================================*/
+
+function createCallRow(call){
+
+    return `
+
+<tr>
+
+    <td>
+
+        <strong>${call.incidentNumber || "Pending"}</strong>
+
+    </td>
+
+    <td>
+
+        ${call.type}
+
+    </td>
+
+    <td>
+
+        ${priorityBadge(call.priority)}
+
+    </td>
+
+    <td>
+
+        ${call.location}
+
+    </td>
+
+    <td>
+
+        ${statusBadge(call.status || "active")}
+
+    </td>
+
+    <td>
+
+        <button
+            class="primaryButton"
+            onclick="dispatchUnits('${call.id}')">
+
+            Dispatch
+
+        </button>
+
+        <button
+            class="secondaryButton"
+            onclick="editCall('${call.id}')">
+
+            Edit
+
+        </button>
+
+        <button
+            class="dangerButton"
+            onclick="closeCall('${call.id}')">
+
+            Close
+
+        </button>
+
+    </td>
+
+</tr>
+
+`;
+
+}
+
+/*====================================================
+PRIORITY BADGES
+====================================================*/
+
+function priorityBadge(priority){
+
+    switch(priority){
+
+        case "low":
+
+            return `<span class="badge available">
+                        Low
+                    </span>`;
+
+        case "medium":
+
+            return `<span class="badge busy">
+                        Medium
+                    </span>`;
+
+        case "high":
+
+            return `<span class="badge outofservice">
+                        High
+                    </span>`;
+
+        case "emergency":
+
+            return `<span class="badge emergency">
+                        Emergency
+                    </span>`;
+
+        default:
+
+            return priority;
+
+    }
+
+}
+
+/*====================================================
+STATUS BADGE
+====================================================*/
+
+function statusBadge(status){
+
+    switch(status){
+
+        case "active":
+
+            return `<span class="badge available">
+                        Active
+                    </span>`;
+
+        case "closed":
+
+            return `<span class="badge outofservice">
+                        Closed
+                    </span>`;
+
+        default:
+
+            return status;
+
+    }
+
+}
+
+/*====================================================
+CREATE CALL
+====================================================*/
+
+createButton.addEventListener("click", createCall);
+
+async function createCall(){
+
+    try{
+
+        await addDoc(callsCollection,{
+
+            incidentNumber: null,
+
+            type: typeInput.value,
+
+            priority: priorityInput.value,
+
+            location: locationInput.value.trim(),
+
+            notes: notesInput.value.trim(),
+
+            status: "active",
+
+            assignedUnits: [],
+
+            timeline: [],
+
+            createdBy: state.currentUser.email,
+
+            createdAt: serverTimestamp(),
+
+            updatedAt: serverTimestamp()
+
+        });
+
+        locationInput.value = "";
+
+        notesInput.value = "";
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        alert("Unable to create call.");
+
+    }
+
+}
 
