@@ -98,6 +98,12 @@ const addButton =
 const tableBody =
     document.getElementById("unitTable");
 
+const searchInput =
+    document.getElementById("unitSearch");
+
+const departmentFilter =
+    document.getElementById("departmentFilter");
+
 /*====================================================
 ADD UNIT
 ====================================================*/
