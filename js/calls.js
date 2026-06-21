@@ -438,6 +438,7 @@ if (!locationInput.value.trim()) {
 
         notesInput.value = "";
 
+        callerInput.value = "";
     }
 
     catch(error){
