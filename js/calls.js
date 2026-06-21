@@ -48,6 +48,9 @@ const cancelDispatchBtn =
 const callerInput =
     document.getElementById("caller");
 
+const activeCallCount =
+    document.getElementById("activeCallCount");
+
 /*====================================================
 GLOBAL VARIABLES
 ====================================================*/
@@ -172,6 +175,12 @@ function renderCalls() {
 
     tableBody.innerHTML = "";
 
+    const activeCalls =
+    state.calls.filter(call => call.status === "active");
+
+activeCallCount.textContent =
+    `${activeCalls.length} Active`;
+    
     if (state.calls.length === 0) {
 
         tableBody.innerHTML = `
@@ -186,13 +195,14 @@ function renderCalls() {
 
     }
 
-    state.calls.forEach(call => {
+state.calls
+    .filter(call => call.status === "active")
+    .forEach(call => {
 
-        tableBody.innerHTML += createCallRow(call);
+        tableBody.innerHTML +=
+            createCallRow(call);
 
     });
-
-}
 
 /*====================================================
 CREATE CALL ROW
@@ -488,7 +498,7 @@ value="${docSnap.id}">
 
 <small>
 
-${unit.department}
+${unit.dept}
 
 </small>
 
