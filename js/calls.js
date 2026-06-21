@@ -29,7 +29,8 @@ import {
     doc,
     onSnapshot,
     serverTimestamp,
-    runTransaction
+    runTransaction,
+    arrayUnion
 
 } from "./firebase-config.js";
 
