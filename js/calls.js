@@ -19,18 +19,15 @@ import {
 
     auth,
     db,
-
+    getDocs,
     onAuthStateChanged,
     signOut,
-
     collection,
     addDoc,
     updateDoc,
     deleteDoc,
     doc,
-
     onSnapshot,
-
     serverTimestamp
 
 } from "./firebase-config.js";
@@ -447,3 +444,60 @@ if (!locationInput.value.trim()) {
 
 }
 
+/*====================================================
+OPEN DISPATCH WINDOW
+====================================================*/
+
+window.dispatchUnits = async function(callId){
+
+    state.selectedCall = callId;
+
+    dispatchModal.style.display = "flex";
+
+    dispatchUnitList.innerHTML = "Loading units...";
+
+    const snapshot =
+        await getDocs(collection(db,"units"));
+
+    let html = "";
+
+    snapshot.forEach(docSnap=>{
+
+        const unit = docSnap.data();
+
+        if(unit.status !== "available") return;
+
+        html += `
+
+<label class="dispatchUnit">
+
+<input
+type="checkbox"
+value="${docSnap.id}">
+
+<strong>${unit.callsign}</strong>
+
+<br>
+
+<small>
+
+${unit.department}
+
+</small>
+
+</label>
+
+`;
+
+    });
+
+    dispatchUnitList.innerHTML =
+        html || "No available units.";
+
+}
+
+cancelDispatchBtn.onclick = ()=>{
+
+    dispatchModal.style.display="none";
+
+};
