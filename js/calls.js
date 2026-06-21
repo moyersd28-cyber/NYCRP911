@@ -35,6 +35,18 @@ import {
 
 } from "./firebase-config.js";
 
+const dispatchModal =
+    document.getElementById("dispatchModal");
+
+const dispatchUnitList =
+    document.getElementById("dispatchUnitList");
+
+const assignUnitsBtn =
+    document.getElementById("assignUnitsBtn");
+
+const cancelDispatchBtn =
+    document.getElementById("cancelDispatchBtn");
+
 /*====================================================
 GLOBAL VARIABLES
 ====================================================*/
