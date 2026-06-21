@@ -45,6 +45,9 @@ const assignUnitsBtn =
 const cancelDispatchBtn =
     document.getElementById("cancelDispatchBtn");
 
+const callerInput =
+    document.getElementById("caller");
+
 /*====================================================
 GLOBAL VARIABLES
 ====================================================*/
@@ -412,6 +415,8 @@ if (!locationInput.value.trim()) {
             priority: priorityInput.value,
 
             location: locationInput.value.trim(),
+
+            caller: callerInput.value.trim(),
 
             notes: notesInput.value.trim(),
 
