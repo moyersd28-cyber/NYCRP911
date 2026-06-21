@@ -30,7 +30,8 @@ import {
     onSnapshot,
     serverTimestamp,
     runTransaction,
-    arrayUnion
+    arrayUnion,
+    getDoc
 
 } from "./firebase-config.js";
 
@@ -59,7 +60,6 @@ GLOBAL VARIABLES
 const callsCollection =
     collection(db, "calls");
 
-let currentUser = null;
 
 /*====================================================
 GLOBAL STATE
@@ -186,7 +186,7 @@ activeCallCount.textContent =
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" class="emptyTable">
+                <td colspan="7" class="emptyTable">
                     No Active Calls
                 </td>
             </tr>
@@ -203,7 +203,7 @@ state.calls
         tableBody.innerHTML +=
             createCallRow(call);
 
-    });
+    });}
 
 /*====================================================
 CREATE CALL ROW
@@ -278,7 +278,85 @@ function createCallRow(call){
 `;
 
 }
+    
+/*====================================================
+ASSIGN SELECTED UNITS
+====================================================*/
 
+assignUnitsBtn.onclick = async () => {
+
+    try {
+
+        if (!state.selectedCall) return;
+
+        const checkedUnits = [
+            ...dispatchUnitList.querySelectorAll(
+                "input[type='checkbox']:checked"
+            )
+        ];
+
+        if (checkedUnits.length === 0) {
+
+            alert("Please select at least one unit.");
+
+            return;
+
+        }
+
+        const selectedIds =
+            checkedUnits.map(box => box.value);
+
+        const selectedNames = [];
+
+        for (const unitId of selectedIds) {
+
+            const unitRef = doc(db, "units", unitId);
+
+            const unitSnap =
+                await getDoc(unitRef);
+
+            if (!unitSnap.exists()) continue;
+
+            const unit =
+                unitSnap.data();
+
+            selectedNames.push(unit.callsign);
+
+            await updateDoc(unitRef, {
+
+                status: "enroute",
+
+                assignedCall: state.selectedCall
+
+            });
+
+        }
+
+        const callRef =
+            doc(db, "calls", state.selectedCall);
+
+        await updateDoc(callRef, {
+
+            assignedUnits: arrayUnion(...selectedNames),
+
+            updatedAt: serverTimestamp()
+
+        });
+
+        dispatchModal.style.display = "none";
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        alert("Unable to assign units.");
+
+    }
+
+};
+    
 /*====================================================
 PRIORITY BADGES
 ====================================================*/
